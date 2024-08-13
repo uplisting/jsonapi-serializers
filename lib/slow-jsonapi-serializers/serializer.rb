@@ -2,13 +2,14 @@ require 'set'
 require 'active_support/inflector'
 require 'active_support/notifications'
 
+module Slow
 module JSONAPI
   module Serializer
     def self.included(target)
       target.send(:include, InstanceMethods)
       target.extend ClassMethods
       target.class_eval do
-        include JSONAPI::Attributes
+        include Slow::JSONAPI::Attributes
       end
     end
 
@@ -18,7 +19,7 @@ module JSONAPI
         # serializer option to be the current class.
         options[:serializer] = self
 
-        JSONAPI::Serializer.serialize(object, options)
+        Slow::JSONAPI::Serializer.serialize(object, options)
       end
     end
 
@@ -128,7 +129,7 @@ module JSONAPI
               # http://jsonapi.org/format/#document-structure-resource-relationships
               data[formatted_attribute_name]['data'] = nil
             else
-              related_object_serializer = JSONAPI::Serializer.find_serializer(object, @options)
+              related_object_serializer = Slow::JSONAPI::Serializer.find_serializer(object, @options)
               data[formatted_attribute_name]['data'] = {
                 'type' => related_object_serializer.type.to_s,
                 'id' => related_object_serializer.id.to_s,
@@ -159,7 +160,7 @@ module JSONAPI
             data[formatted_attribute_name]['data'] = []
             objects = has_many_relationship(attribute_name, attr_data) || []
             objects.each do |obj|
-              related_object_serializer = JSONAPI::Serializer.find_serializer(obj, @options)
+              related_object_serializer = Slow::JSONAPI::Serializer.find_serializer(obj, @options)
               data[formatted_attribute_name]['data'] << {
                 'type' => related_object_serializer.type.to_s,
                 'id' => related_object_serializer.id.to_s,
@@ -307,7 +308,7 @@ module JSONAPI
       }
 
       if !options[:skip_collection_check] && options[:is_collection] && !objects.respond_to?(:each)
-        raise JSONAPI::Serializer::AmbiguousCollectionError.new(
+        raise Slow::JSONAPI::Serializer::AmbiguousCollectionError.new(
           'Attempted to serialize a single object as a collection.')
       end
 
@@ -333,7 +334,7 @@ module JSONAPI
         # We always must be told if serializing a collection because the JSON:API spec distinguishes
         # how to serialize null single resources vs. empty collections.
         if !options[:skip_collection_check] && objects.respond_to?(:each)
-          raise JSONAPI::Serializer::AmbiguousCollectionError.new(
+          raise Slow::JSONAPI::Serializer::AmbiguousCollectionError.new(
             'Must provide `is_collection: true` to `serialize` when serializing collections.')
         end
         # Have single object.
@@ -469,7 +470,7 @@ module JSONAPI
           # Skip the sentinal value, but we need to preserve it for siblings.
           next if attribute_name == :_include
 
-          serializer = JSONAPI::Serializer.find_serializer(root_object, options)
+          serializer = Slow::JSONAPI::Serializer.find_serializer(root_object, options)
           unformatted_attr_name = serializer.unformat_name(attribute_name).to_sym
 
           # We know the name of this relationship, but we don't know where it is stored internally.
@@ -489,14 +490,14 @@ module JSONAPI
           end
 
           if !is_valid_attr
-            raise JSONAPI::Serializer::InvalidIncludeError.new(
+            raise Slow::JSONAPI::Serializer::InvalidIncludeError.new(
               "'#{attribute_name}' is not a valid include.")
           end
 
           if attribute_name != serializer.format_name(attribute_name)
             expected_name = serializer.format_name(attribute_name)
 
-            raise JSONAPI::Serializer::InvalidIncludeError.new(
+            raise Slow::JSONAPI::Serializer::InvalidIncludeError.new(
               "'#{attribute_name}' is not a valid include.  Did you mean '#{expected_name}' ?"
             )
           end
@@ -512,7 +513,7 @@ module JSONAPI
             # If it is not set, that indicates that this is an inner path and not a leaf and will
             # be followed by the recursion below.
             objects.each do |obj|
-              obj_serializer = JSONAPI::Serializer.find_serializer(obj, options)
+              obj_serializer = Slow::JSONAPI::Serializer.find_serializer(obj, options)
               # Use keys of ['posts', '1'] for the results to enforce uniqueness.
               # Spec: A compound document MUST NOT include more than one resource object for each
               # type and id pair.
@@ -584,4 +585,5 @@ module JSONAPI
     end
     class << self; protected :merge_relationship_path; end
   end
+end
 end

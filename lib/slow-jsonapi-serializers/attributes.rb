@@ -1,3 +1,4 @@
+module Slow
 module JSONAPI
   module Attributes
     def self.included(target)
@@ -74,4 +75,5 @@ module JSONAPI
       private :add_to_many_association
     end
   end
+end
 end

@@ -1,5 +1,5 @@
 require 'factory_girl'
-require './lib/jsonapi-serializers'
+require './lib/slow-jsonapi-serializers'
 require './spec/support/serializers'
 
 RSpec.configure do |config|

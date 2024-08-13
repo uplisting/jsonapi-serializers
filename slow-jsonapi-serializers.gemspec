@@ -1,11 +1,11 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'jsonapi-serializers/version'
+require 'slow-jsonapi-serializers/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "jsonapi-serializers"
-  spec.version       = JSONAPI::Serializer::VERSION
+  spec.name          = "slow-jsonapi-serializers"
+  spec.version       = Slow::JSONAPI::Serializer::VERSION
   spec.authors       = ["Mike Fotinakis"]
   spec.email         = ["mike@fotinakis.com"]
   spec.summary       = %q{Pure Ruby readonly serializers for the JSON:API spec.}
